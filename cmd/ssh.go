@@ -34,10 +34,20 @@ var sshCmd = &cobra.Command{
 	Long: `This generates a new SSH cert by talking to slackd via HTTP.
 sb adds the returned Cert + Private key to your local ssh-agent.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cert, err := getCert()
+		url, err := cmd.Flags().GetString("url")
+
+		if err != nil {
+			log.Fatal("Error parsing url flag: ", err)
+		}
+
+		cert, err := getCert(url)
 
 		if err != nil {
 			log.Fatal("Error getting cert: ", err)
+		}
+
+		if cert.Key == "" {
+			log.Fatal("Cert doesn't have a Key.")
 		}
 
 		sshCert, key, err := parseCert(cert)
@@ -85,7 +95,7 @@ func addToAgent(cert *ssh.Certificate, key *ecdsa.PrivateKey) {
 	}
 }
 
-func getCert() (cert Cert, error error) {
+func getCert(url string) (cert Cert, error error) {
 	x := new(bytes.Buffer)
 	tokenString, err := util.ReturnToken()
 
@@ -99,7 +109,7 @@ func getCert() (cert Cert, error error) {
 
 	json.NewEncoder(x).Encode(token)
 
-	resp, err := http.Post(os.Getenv("SLACKD")+"/ssh", "application/json", x)
+	resp, err := http.Post(url+"/ssh", "application/json", x)
 
 	if err != nil {
 		return cert, err
@@ -114,4 +124,5 @@ func getCert() (cert Cert, error error) {
 
 func init() {
 	rootCmd.AddCommand(sshCmd)
+	sshCmd.Flags().String("url", "https://slackd-beta.herokuapp.com", "Set an alternate API URL")
 }
