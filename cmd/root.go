@@ -4,10 +4,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var AppVersion string
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "sb",
 	Short: "A cli to automate various things around Sparkbox.",
+	//AppVersion is pulled from the latest git tag at compile time.
+	Version: AppVersion,
 	Long: `For now we use Slack as our Authentication service in lieu of something like LDAP.
 We currently only support generating SSH certificates for the various hosts we manage.
 In the future we could handle things like onboarding here.`,
