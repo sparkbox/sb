@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"sb/util"
+	"time"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh"
@@ -79,6 +80,11 @@ func parseCert(cert Cert) (sshCert *ssh.Certificate, key *ecdsa.PrivateKey, erro
 }
 
 func addToAgent(cert *ssh.Certificate, key *ecdsa.PrivateKey) {
+	// validBefore - now === ssh-agent lifetime
+	diff := time.Unix(int64(cert.ValidBefore), 0).Sub(time.Now())
+	// need seconds for lifetime to pass to Agent
+	lifetime := int(diff.Seconds())
+
 	con, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK"))
 
 	if err != nil {
@@ -87,11 +93,14 @@ func addToAgent(cert *ssh.Certificate, key *ecdsa.PrivateKey) {
 
 	sshAgent := agent.NewClient(con)
 
-	if err = sshAgent.Add(agent.AddedKey{
-		PrivateKey:  key,
-		Certificate: cert,
-	}); err != nil {
-		log.Fatal("ssh-agent failure: ", err)
+	err = sshAgent.Add(agent.AddedKey{
+		PrivateKey:   key,
+		Certificate:  cert,
+		LifetimeSecs: uint32(lifetime),
+	})
+
+	if err != nil {
+		log.Fatal("Failed to add to ssh-agent: ", err)
 	}
 }
 
