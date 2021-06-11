@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"bytes"
 	"crypto/ecdsa"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -105,7 +105,7 @@ func addToAgent(cert *ssh.Certificate, key *ecdsa.PrivateKey) {
 }
 
 func getCert(url string) (cert Cert, error error) {
-	x := new(bytes.Buffer)
+	readData, writeData := io.Pipe()
 	tokenString, err := util.ReturnToken()
 
 	if err != nil {
@@ -116,9 +116,12 @@ func getCert(url string) (cert Cert, error error) {
 		tokenString,
 	}
 
-	json.NewEncoder(x).Encode(token)
+	go func() {
+		json.NewEncoder(writeData).Encode(token)
+		writeData.Close()
+	}()
 
-	resp, err := http.Post(url+"/ssh", "application/json", x)
+	resp, err := http.Post(url+"/ssh", "application/json", readData)
 
 	if err != nil {
 		return cert, err
