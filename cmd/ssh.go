@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -41,6 +42,18 @@ sb adds the returned Cert + Private key to your local ssh-agent.`,
 			log.Fatal("Error parsing url flag: ", err)
 		}
 
+		print, err := cmd.Flags().GetBool("print")
+
+		if err != nil {
+			log.Fatal("Error parsing print flag: ", err)
+		}
+
+		write, err := cmd.Flags().GetBool("write")
+
+		if err != nil {
+			log.Fatal("Error parsing write flag: ", err)
+		}
+
 		cert, err := getCert(url)
 
 		if err != nil {
@@ -51,14 +64,45 @@ sb adds the returned Cert + Private key to your local ssh-agent.`,
 			log.Fatal("Cert doesn't have a Key.")
 		}
 
-		sshCert, key, err := parseCert(cert)
-
-		if err != nil {
-			log.Fatal("Error parsing Certificate: ", err)
+		if print {
+			printCertAndKey(cert)
 		}
 
-		addToAgent(sshCert, key)
+		if write {
+			writeToFile(cert)
+		}
+
+		if !write && !print {
+			sshCert, key, err := parseCert(cert)
+			if err != nil {
+				log.Fatal("Error parsing Certificate: ", err)
+			}
+
+			addToAgent(sshCert, key)
+		}
 	},
+}
+
+func writeToFile(cert Cert) {
+	err := ioutil.WriteFile("key", []byte(cert.Key), 0600)
+	if err != nil {
+		fmt.Println("Error writing key file: ", err)
+	}
+
+	err = ioutil.WriteFile("key-cert.pub", []byte(cert.Certificate), 0600)
+	if err != nil {
+		fmt.Println("Error writing key file: ", err)
+	}
+}
+
+func printCertAndKey(cert Cert) {
+	fmt.Println(`ssh-agent expects a private key to go along with a certificate.
+To add a certificate to ssh-agent manually you specify the private key (bar)
+and it will automatically detect the certificate (bar-cert.pub) by convention.`)
+	fmt.Println("Certificate: ")
+	fmt.Println(cert.Certificate)
+	fmt.Println("Key: ")
+	fmt.Println(cert.Key)
 }
 
 func parseCert(cert Cert) (sshCert *ssh.Certificate, key *ecdsa.PrivateKey, error error) {
@@ -136,5 +180,7 @@ func getCert(url string) (cert Cert, error error) {
 
 func init() {
 	rootCmd.AddCommand(sshCmd)
-	sshCmd.Flags().String("url", "https://slackd-beta.herokuapp.com", "Set an alternate API URL")
+	sshCmd.Flags().StringP("url", "u", "https://slackd-beta.herokuapp.com", "Set an alternate API URL")
+	sshCmd.Flags().BoolP("print", "p", false, "Print cert and private key instead of adding to ssh-agent")
+	sshCmd.Flags().BoolP("write", "w", false, "Write cert (key-cert.pub) and key (key) to files instead of adding them to ssh-agent")
 }
