@@ -7,8 +7,10 @@ This expiration means access to Sparkbox Slack is required to get SSH access to 
 
 ## How to use
 
+Note: You'll need a running instance of [`sshackd`](https://github.com/sparkbox/sshackd) somewhere for this to work at all. Pass your instance URL with the `-u` flag.
+
 1. Download `sb` from the latest release for your architecture.
 2. Login by running `sb login`. This should launch a Sign-in with Slack prompt in your browser. Paste the resultant ID and token back to `sb`.
-3. You're now set to generate a SSH Certificate, run `sb ssh`.
+3. You're now set to generate a SSH Certificate, run `sb ssh -u your.sshackd.instance`.
 4. Verify your local `ssh-agent` has the cert by running `ssh-add -l`and noting the `ECDSA-CERT` entry.
 5. You can now SSH to any host that is configured to trust the Certificate Authority.

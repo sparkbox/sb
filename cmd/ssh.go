@@ -180,7 +180,7 @@ func getCert(url string) (cert Cert, error error) {
 
 func init() {
 	rootCmd.AddCommand(sshCmd)
-	sshCmd.Flags().StringP("url", "u", "https://slackd-beta.herokuapp.com", "Set an alternate API URL")
+	sshCmd.Flags().StringP("url", "u", "https://sshackd.herokuapp.com", "Set an alternate API URL")
 	sshCmd.Flags().BoolP("print", "p", false, "Print cert and private key instead of adding to ssh-agent")
 	sshCmd.Flags().BoolP("write", "w", false, "Write cert (key-cert.pub) and key (key) to files instead of adding them to ssh-agent")
 }
