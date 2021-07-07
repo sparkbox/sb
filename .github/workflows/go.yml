@@ -1,0 +1,22 @@
+name: Go
+
+on:
+  push:
+  release:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GIT_TAG: $GITHUB_REF
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: build
+      run: ./build.sh
