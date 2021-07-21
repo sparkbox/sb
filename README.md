@@ -12,3 +12,7 @@ This expiration means access to Sparkbox Slack is required to get SSH access to 
 3. You're now set to generate a SSH Certificate, run `sb ssh`.
 4. Verify your local `ssh-agent` has the cert by running `ssh-add -l`and noting the `ECDSA-CERT` entry.
 5. You can now SSH to any host that is configured to trust the Certificate Authority.
+
+## How it works
+
+![](https://sparkbox.github.io/sb/flow.png)
