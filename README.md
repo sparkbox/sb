@@ -7,12 +7,18 @@ This expiration means access to Sparkbox Slack is required to get SSH access to 
 
 ## How to use
 
-1. Download `sb` from the latest release for your architecture.
-2. Login by running `sb login`. This should launch a Sign-in with Slack prompt in your browser. Paste the resultant ID and token back to `sb`.
-3. You're now set to generate a SSH Certificate, run `sb ssh`.
-4. Verify your local `ssh-agent` has the cert by running `ssh-add -l`and noting the `ECDSA-CERT` entry.
-5. You can now SSH to any host that is configured to trust the Certificate Authority.
+1. Download `sb` from the [latest release](https://github.com/sparkbox/sb/releases) for your architecture.
+1. Run the file to install `sb`. *On a Mac, you will need to `control + click` the unzipped file and select "Open" from the menu.*
+1. Login by running `sb login`. This should launch a Sign-in with Slack prompt in your browser. Paste the resultant ID and token back to `sb`.
+1. You're now set to generate a SSH Certificate, run `sb ssh`.
+1. Verify your local `ssh-agent` has the cert by running `ssh-add -l`and noting the `ECDSA-CERT` entry.
+1. You can now SSH to any host that is configured to trust the Certificate Authority.
 
 ## How it works
 
 ![](https://sparkbox.github.io/sb/flow.png)
+
+## Helpful Notes
+
+* If you are using an Intel based machine, use the AMD64 file.
+* If you are using an M1 MacBook, use the AMR64 file.
