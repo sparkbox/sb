@@ -24,4 +24,4 @@ This expiration means access to Sparkbox Slack is required to get SSH access to 
 ## Helpful Notes
 
 * If you are using an Intel based machine, use the AMD64 file.
-* If you are using an M1 MacBook, use the AMR64 file.
+* If you are using an M1 MacBook, use the ARM64 file.
