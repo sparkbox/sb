@@ -1,0 +1,11 @@
+{
+    "source" : ["./amd64-darwin-sb"],
+    "bundle_id" : "com.sparkbox.sb",
+    "sign" :{
+        "application_identity" : "Developer ID Application: Rob Harr (J77MB48G77)"
+    },
+    "dmg" :{
+        "output_path" : "./amd64-darwin-sb.dmg",
+        "volume_name" : "amd64-sb"
+    }
+}
