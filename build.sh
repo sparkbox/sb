@@ -13,13 +13,15 @@ upload_file() {
     if [ "${NAME}" = "amd64-linux-sb" ]; then
         zip "${NAME}.zip" "${NAME}"
         NAME="${NAME}.zip"
+        CONTENT_TYPE="Content-Type: application/zip"
     else
         NAME="${NAME}.dmg"
+        CONTENT_TYPE="Content-Type: application/octet-stream"
     fi
 
     curl -H "Accept: application/vnd.github.v3+json" \
          -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-         -H "Content-Type: application/zip" \
+         -H "${CONTENT_TYPE}" \
          --data-binary "@${NAME}" \
          "${UPLOAD_URL}?name=${NAME}"
 }
