@@ -39,12 +39,12 @@ setup_keychain() {
 
 sign() {
   PLATFORM=$1
-  gon -log-json -log-level=info "./${PLATFORM}-gon-config.json"
+  ./gon -log-json -log-level=info "./${PLATFORM}-gon-config.json"
 }
 
 setup_keychain
-brew tap mitchellh/gon
-brew install mitchellh/gon/gon
+curl -LO "https://github.com/mitchellh/gon/releases/download/v0.2.3/gon_macos.zip"
+unzip ./gon_macos.zip
 
 for PLATFORM in ${RELEASES}; do
     GOOS=$(echo "${PLATFORM}" | cut -d - -f 2) \
