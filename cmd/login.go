@@ -58,7 +58,7 @@ func saveToken(token []byte) error {
 
 func signInWithSlack() {
 	var token []byte
-	const url = `https://slack.com/oauth/v2/authorize?client_id=2160869413.2032676856630&user_scope=users:read,users:read.email`
+	const url = `https://slack.com/oauth/v2/authorize?client_id=2160869413.4861271822512&user_scope=users:read,users:read.email`
 	browser.OpenURL(url)
 
 	scanner := bufio.NewScanner(os.Stdin)
