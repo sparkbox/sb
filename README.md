@@ -35,3 +35,20 @@ This expiration means access to Sparkbox Slack is required to get SSH access to 
 
 * If you are using an Intel based machine, use the AMD64 file.
 * If you are using an M1 MacBook, use the AMR64 file.
+
+## Troubleshooting
+
+### Permission denied errors may be related to using 1Passwrod to manage SSH keys
+
+If you are getting permission denied errors and you are uncertain why, check whether you are using 1Password as your SSH agent. 1Password can manage SSH keys separately from the system `ssh-agent`, which can prevent `sb` certificates from being used when you connect to a host.
+
+1. Open `~/.ssh/config`
+2. If the file has the following, it is using [1Password to manage SSH keys](https://www.1password.dev/ssh/get-started).
+
+```
+Host *
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+```
+
+3. Remove `IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"` from the file and save it.
+4. Try using `sb ssh` again.
