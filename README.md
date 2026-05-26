@@ -38,7 +38,7 @@ This expiration means access to Sparkbox Slack is required to get SSH access to 
 
 ## Troubleshooting
 
-### Permission denied errors
+### Permission denied errors may be related to using 1Passwrod to manage SSH keys
 
 If you are getting permission denied errors and you are uncertain why, check whether you are using 1Password as your SSH agent. 1Password can manage SSH keys separately from the system `ssh-agent`, which can prevent `sb` certificates from being used when you connect to a host.
 
