@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"crypto/x509"
 	"encoding/json"
@@ -137,15 +138,55 @@ func addToAgent(cert *ssh.Certificate, key *ecdsa.PrivateKey) {
 
 	sshAgent := agent.NewClient(con)
 
-	err = sshAgent.Add(agent.AddedKey{
-		PrivateKey:   key,
-		Certificate:  cert,
-		LifetimeSecs: uint32(lifetime),
-	})
+	err = replaceCert(sshAgent, cert, key, uint32(lifetime))
 
 	if err != nil {
 		log.Fatal("Failed to add to ssh-agent: ", err)
 	}
+}
+
+// Every `sb ssh` run adds a fresh cert, so without this the agent keeps
+// collecting older certs from the same CA until each one expires.
+func replaceCert(sshAgent agent.Agent, cert *ssh.Certificate, key *ecdsa.PrivateKey, lifetime uint32) error {
+	err := sshAgent.Add(agent.AddedKey{
+		PrivateKey:   key,
+		Certificate:  cert,
+		LifetimeSecs: lifetime,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	keys, err := sshAgent.List()
+
+	if err != nil {
+		return err
+	}
+
+	for _, k := range keys {
+		pub, err := ssh.ParsePublicKey(k.Blob)
+
+		if err != nil {
+			continue
+		}
+
+		existing, ok := pub.(*ssh.Certificate)
+
+		if !ok || bytes.Equal(k.Blob, cert.Marshal()) {
+			continue
+		}
+
+		if !bytes.Equal(existing.SignatureKey.Marshal(), cert.SignatureKey.Marshal()) {
+			continue
+		}
+
+		if err := sshAgent.Remove(k); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func getCert(url string) (cert Cert, error error) {
